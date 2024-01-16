@@ -1,0 +1,2125 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head></head><body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    
+    
+    
+    
+
+
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput">
+<h1>Sentiment Analysis Project<a rel="noopener" class="anchor-link" href="#Sentiment-Analysis-Project">&#182;</a></h1>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[34]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># manipulation data</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1">#visualiation data</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span> 
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
+<span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
+<span class="kn">from</span> <span class="nn">plotly.offline</span> <span class="kn">import</span> <span class="n">init_notebook_mode</span><span class="p">,</span> <span class="n">iplot</span>
+
+
+<span class="c1">#from dataprep.eda import *</span>
+<span class="c1">#from dataprep.datasets import load_dataset</span>
+<span class="c1">#from dataprep.eda import create_report</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_val_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">mean_absolute_error</span><span class="p">,</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">precision_score</span><span class="p">,</span> <span class="n">recall_score</span><span class="p">,</span> <span class="n">f1_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">r2_score</span><span class="p">,</span> <span class="n">classification_report</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">PolynomialFeatures</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelEncoder</span>
+<span class="kn">from</span> <span class="nn">xgboost</span> <span class="kn">import</span> <span class="n">XGBClassifier</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">import</span> <span class="nn">joblib</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.class_weight</span> <span class="kn">import</span> <span class="n">compute_class_weight</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">SVC</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelEncoder</span>
+
+
+
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">Lasso</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">SGDRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">MultinomialNB</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">word_tokenize</span>
+<span class="kn">from</span> <span class="nn">nltk.corpus</span> <span class="kn">import</span> <span class="n">stopwords</span>
+
+
+<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+
+<span class="kn">from</span> <span class="nn">googleapiclient.discovery</span> <span class="kn">import</span> <span class="n">build</span>
+<span class="kn">import</span> <span class="nn">praw</span>
+<span class="kn">from</span> <span class="nn">gensim.models.doc2vec</span> <span class="kn">import</span> <span class="n">Doc2Vec</span><span class="p">,</span> <span class="n">TaggedDocument</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span><span class="p">,</span> <span class="n">TfidfVectorizer</span><span class="p">,</span> <span class="n">HashingVectorizer</span><span class="p">,</span> <span class="n">ENGLISH_STOP_WORDS</span>
+<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">SVC</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">classification_report</span>
+<span class="kn">import</span> <span class="nn">demoji</span>
+<span class="kn">from</span> <span class="nn">gensim.models</span> <span class="kn">import</span> <span class="n">Word2Vec</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput">
+<h1>Data Gathering<a rel="noopener" class="anchor-link" href="#Data-Gathering">&#182;</a></h1>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput">
+<h2>Reddit<a rel="noopener" class="anchor-link" href="#Reddit">&#182;</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[35]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">reddit</span> <span class="o">=</span> <span class="n">praw</span><span class="o">.</span><span class="n">Reddit</span><span class="p">(</span><span class="n">client_id</span> <span class="o">=</span><span class="s1">&#39;6d70d19AQb3YLMNkHzXyow&#39;</span><span class="p">,</span>
+<span class="n">client_secret</span> <span class="o">=</span><span class="s1">&#39;74mCP3YG8SveaELNtR3mdSXxspuWkQ&#39;</span><span class="p">,</span>
+<span class="n">user_agent</span> <span class="o">=</span><span class="s1">&#39;sentiment analysis&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">reddit</span><span class="o">.</span><span class="n">read_only</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output">
+<pre>True
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[36]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1">#Reddit post - https://www.reddit.com/r/kitchener/comments/18dc0ov/positive_step_towards_our_society/</span>
+<span class="n">submission</span> <span class="o">=</span> <span class="n">reddit</span><span class="o">.</span><span class="n">submission</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;18dc0ov&#39;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[37]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Post Title: </span><span class="si">{</span><span class="n">submission</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output">
+<pre>Post Title: Positive step towards our society
+
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[38]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">output_file_path</span><span class="o">=</span><span class="s1">&#39;../data/text_based_posts.txt&#39;</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[39]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">output_file</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">comment</span> <span class="ow">in</span> <span class="n">submission</span><span class="o">.</span><span class="n">comments</span><span class="o">.</span><span class="n">list</span><span class="p">():</span>
+        <span class="n">output_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Comment: </span><span class="si">{</span><span class="n">comment</span><span class="o">.</span><span class="n">body</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput">
+<h2>YouTube Comment<a rel="noopener" class="anchor-link" href="#YouTube-Comment">&#182;</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[40]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">api_key</span> <span class="o">=</span> <span class="s1">&#39;AIzaSyDpdg8ir0sIe40UZU-OnzFiGqRijizJp2w&#39;</span>
+<span class="n">youtube</span> <span class="o">=</span> <span class="n">build</span><span class="p">(</span><span class="s1">&#39;youtube&#39;</span><span class="p">,</span> <span class="s1">&#39;v3&#39;</span><span class="p">,</span> <span class="n">developerKey</span><span class="o">=</span><span class="n">api_key</span><span class="p">)</span>
+
+<span class="c1">#YouTube video - https://www.youtube.com/watch?v=8_RL4Lq-OG0</span>
+<span class="n">video_id</span> <span class="o">=</span> <span class="s1">&#39;8_RL4Lq-OG0&#39;</span>
+
+<span class="n">top_level_request</span> <span class="o">=</span> <span class="n">youtube</span><span class="o">.</span><span class="n">commentThreads</span><span class="p">()</span><span class="o">.</span><span class="n">list</span><span class="p">(</span>
+    <span class="n">part</span><span class="o">=</span><span class="s1">&#39;snippet&#39;</span><span class="p">,</span>
+    <span class="n">videoId</span><span class="o">=</span><span class="n">video_id</span><span class="p">,</span>
+    <span class="n">textFormat</span><span class="o">=</span><span class="s1">&#39;plainText&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">top_level_response</span> <span class="o">=</span> <span class="n">top_level_request</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+<span class="n">comments</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">top_level_comment</span> <span class="ow">in</span> <span class="n">top_level_response</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]:</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="n">top_level_comment</span><span class="p">[</span><span class="s1">&#39;snippet&#39;</span><span class="p">][</span><span class="s1">&#39;topLevelComment&#39;</span><span class="p">][</span><span class="s1">&#39;snippet&#39;</span><span class="p">][</span><span class="s1">&#39;authorDisplayName&#39;</span><span class="p">]</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">top_level_comment</span><span class="p">[</span><span class="s1">&#39;snippet&#39;</span><span class="p">][</span><span class="s1">&#39;topLevelComment&#39;</span><span class="p">][</span><span class="s1">&#39;snippet&#39;</span><span class="p">][</span><span class="s1">&#39;textDisplay&#39;</span><span class="p">]</span>
+    <span class="n">comments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Comment: </span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput">
+<h2>Merging the gathered data in one file<a rel="noopener" class="anchor-link" href="#Merging-the-gathered-data-in-one-file">&#182;</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[41]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file_path</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">comment</span> <span class="ow">in</span> <span class="n">comments</span><span class="p">:</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">comment</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput">
+<h1>Text Preprocessing<a rel="noopener" class="anchor-link" href="#Text-Preprocessing">&#182;</a></h1>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput">
+<ul>
+<li><p>This code defines a text preprocessing function named preprocess_text. It takes an input text and performs various preprocessing steps:</p>
+</li>
+<li><p>Converts the text to lowercase.</p>
+</li>
+<li><p>Removes URLs.</p>
+</li>
+<li><p>Removes Twitter handles (e.g., @username).</p>
+</li>
+<li><p>Removes non-alphanumeric characters.</p>
+</li>
+<li><p>Removes emojis using the demoji library.</p>
+</li>
+<li><p>Tokenizes the text into a list of words.</p>
+</li>
+<li><p>Removes English stop words.</p>
+</li>
+<li><p>Joins the tokens back into a preprocessed text string.</p>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[42]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">demoji</span><span class="o">.</span><span class="n">download_codes</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output">
+<pre>C:\Users\Rj\AppData\Local\Temp\ipykernel_14980\2299328559.py:1: FutureWarning:
+
+The demoji.download_codes attribute is deprecated and will be removed from demoji in a future version. It is an unused attribute as emoji codes are now distributed directly with the demoji package.
+
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[43]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">stop_words_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ENGLISH_STOP_WORDS</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[44]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">preprocess_text</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;https?:\/\/\S+&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;@[A-Za-z0-9]+&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[^A-Za-z0-9\s]+&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">demoji</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="n">tokens</span> <span class="o">=</span> <span class="n">word_tokenize</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="n">stop_words</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stopwords</span><span class="o">.</span><span class="n">words</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">))</span>
+    <span class="n">tokens</span> <span class="o">=</span> <span class="p">[</span><span class="n">token</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span> <span class="k">if</span> <span class="n">token</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stop_words</span><span class="p">]</span>
+
+    <span class="n">preprocessed_text</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">preprocessed_text</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput">
+<h1>Data Labeling using pre-trained SentimentAnalyzer<a rel="noopener" class="anchor-link" href="#Data-Labeling-using-pre-trained-SentimentAnalyzer">&#182;</a></h1>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput">
+<p>This code performs sentiment analysis on a dataset of text-based posts using the Natural Language Toolkit (NLTK) library. It reads a file containing posts, assumes each post is separated by the &quot;Comment:&quot; delimiter, and analyzes the sentiment of each post. The sentiment is determined as &#39;positive&#39;, &#39;negative&#39;, or &#39;neutral&#39; based on the compound score obtained from the NLTK SentimentIntensityAnalyzer. The results, including the text content, sentiment label, and sentiment score, are stored in an annotated dataset.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[45]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">nltk.sentiment</span> <span class="kn">import</span> <span class="n">SentimentIntensityAnalyzer</span>
+<span class="n">sia</span> <span class="o">=</span> <span class="n">SentimentIntensityAnalyzer</span><span class="p">()</span>
+
+<span class="n">input_file_path</span> <span class="o">=</span> <span class="s2">&quot;../data/text_based_posts.txt&quot;</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">input_file</span><span class="p">:</span>
+    <span class="n">examples</span> <span class="o">=</span> <span class="n">input_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;Comment:&quot;</span><span class="p">)</span>
+
+<span class="n">annotated_dataset</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">example</span> <span class="ow">in</span> <span class="n">examples</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">example</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+        <span class="k">continue</span>
+    
+    <span class="n">text_content</span> <span class="o">=</span> <span class="n">preprocess_text</span><span class="p">(</span><span class="n">example</span><span class="p">)</span>
+    
+    <span class="n">sentiment_scores</span> <span class="o">=</span> <span class="n">sia</span><span class="o">.</span><span class="n">polarity_scores</span><span class="p">(</span><span class="n">text_content</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">sentiment_scores</span><span class="p">[</span><span class="s1">&#39;compound&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.05</span><span class="p">:</span>
+        <span class="n">sentiment_label</span> <span class="o">=</span> <span class="s1">&#39;positive&#39;</span>
+    <span class="k">elif</span> <span class="n">sentiment_scores</span><span class="p">[</span><span class="s1">&#39;compound&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">:</span>
+        <span class="n">sentiment_label</span> <span class="o">=</span> <span class="s1">&#39;negative&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sentiment_label</span> <span class="o">=</span> <span class="s1">&#39;neutral&#39;</span>
+    
+    <span class="n">annotated_dataset</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+        <span class="s1">&#39;text_content&#39;</span><span class="p">:</span> <span class="n">text_content</span><span class="p">,</span>
+        <span class="s1">&#39;sentiment&#39;</span><span class="p">:</span> <span class="n">sentiment_label</span><span class="p">,</span>
+        <span class="s1">&#39;sentiment_score&#39;</span><span class="p">:</span> <span class="n">sentiment_scores</span><span class="p">[</span><span class="s1">&#39;compound&#39;</span><span class="p">]</span>
+    <span class="p">})</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[46]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">annotated_dataset</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[46]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult">
+<pre>92</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[47]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">examples</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[47]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult">
+<pre>93</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[48]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">annotated_dataset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[48]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult">
+<pre>{&#39;text_content&#39;: &#39;nice start need introduce random checks insure money still account used student accepted canada study well&#39;,
+ &#39;sentiment&#39;: &#39;positive&#39;,
+ &#39;sentiment_score&#39;: 0.7184}</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[49]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">neutral_count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">pos_count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">neg_count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">annotated_dataset</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;neutral&#39;</span><span class="p">:</span>
+        <span class="n">neutral_count</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;negative&#39;</span><span class="p">:</span>
+        <span class="n">neg_count</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;positive&#39;</span><span class="p">:</span>
+        <span class="n">pos_count</span> <span class="o">+=</span> <span class="mi">1</span>
+    
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Length of Neutral Sentiment Tags:&quot;</span><span class="p">,</span> <span class="n">neutral_count</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Length of Positive Sentiment Tags:&quot;</span><span class="p">,</span> <span class="n">pos_count</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Length of Negative Sentiment Tags:&quot;</span><span class="p">,</span> <span class="n">neg_count</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output">
+<pre>Length of Neutral Sentiment Tags: 31
+Length of Positive Sentiment Tags: 42
+Length of Negative Sentiment Tags: 19
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[50]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">annotated_dataset</span><span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[50]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult">
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text_content</th>
+      <th>sentiment</th>
+      <th>sentiment_score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>nice start need introduce random checks insure...</td>
+      <td>positive</td>
+      <td>0.7184</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>time crack dollarama colleges selling business...</td>
+      <td>negative</td>
+      <td>-0.3818</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>organizations students use spoof funds account...</td>
+      <td>negative</td>
+      <td>-0.1477</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>praying raise 55k though</td>
+      <td>positive</td>
+      <td>0.3612</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>cbc article</td>
+      <td>neutral</td>
+      <td>0.0000</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>87</th>
+      <td>next time visit crafty ramen road train statio...</td>
+      <td>neutral</td>
+      <td>0.0000</td>
+    </tr>
+    <tr>
+      <th>88</th>
+      <td>first tip enjoying kitchener get outta downtow...</td>
+      <td>positive</td>
+      <td>0.7184</td>
+    </tr>
+    <tr>
+      <th>89</th>
+      <td>16 turning 17 life shit hole dont like want le...</td>
+      <td>negative</td>
+      <td>-0.7970</td>
+    </tr>
+    <tr>
+      <th>90</th>
+      <td>guy walks first minutes video every day wild 4...</td>
+      <td>neutral</td>
+      <td>0.0000</td>
+    </tr>
+    <tr>
+      <th>91</th>
+      <td>rent cheaper bahahaha</td>
+      <td>neutral</td>
+      <td>0.0000</td>
+    </tr>
+  </tbody>
+</table>
+<p>92 rows &#215; 3 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[51]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;text_content&#39;</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span>
+<span class="n">label_encoder</span> <span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">()</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">label_encoder</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">preprocess_text</span><span class="p">)</span>
+<span class="c1"># Split the dataset</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput">
+<h1>Text Feature Extraction Methods<a rel="noopener" class="anchor-link" href="#Text-Feature-Extraction-Methods">&#182;</a></h1>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[52]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Method 1: Count Vectorizer</span>
+<span class="n">count_vectorizer</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">stop_words</span><span class="o">=</span><span class="n">stop_words_list</span><span class="p">)</span>
+<span class="n">X_train_count</span> <span class="o">=</span> <span class="n">count_vectorizer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">X_test_count</span> <span class="o">=</span> <span class="n">count_vectorizer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[53]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Method 2: TF-IDF Vectorizer</span>
+<span class="n">tfidf_vectorizer</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">(</span><span class="n">stop_words</span><span class="o">=</span><span class="n">stop_words_list</span><span class="p">)</span>
+<span class="n">X_train_tfidf</span> <span class="o">=</span> <span class="n">tfidf_vectorizer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">X_test_tfidf</span> <span class="o">=</span> <span class="n">tfidf_vectorizer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[54]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Method 3: Hashing Vectorizer</span>
+<span class="n">hashing_vectorizer</span> <span class="o">=</span> <span class="n">HashingVectorizer</span><span class="p">(</span><span class="n">stop_words</span><span class="o">=</span><span class="n">stop_words_list</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">alternate_sign</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">X_train_hashing</span> <span class="o">=</span> <span class="n">hashing_vectorizer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">X_test_hashing</span> <span class="o">=</span> <span class="n">hashing_vectorizer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[55]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Method 4: Doc2Vec</span>
+
+<span class="n">train_documents</span> <span class="o">=</span> <span class="p">[</span><span class="n">TaggedDocument</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="n">doc</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">doc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">X_train</span><span class="p">)]</span>
+<span class="n">test_documents</span> <span class="o">=</span> <span class="p">[</span><span class="n">TaggedDocument</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="n">doc</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">doc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">X_test</span><span class="p">)]</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[56]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">doc2vec_model</span> <span class="o">=</span> <span class="n">Doc2Vec</span><span class="p">(</span><span class="n">vector_size</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">doc2vec_model</span><span class="o">.</span><span class="n">build_vocab</span><span class="p">(</span><span class="n">train_documents</span><span class="p">)</span>
+<span class="n">doc2vec_model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">train_documents</span><span class="p">,</span> <span class="n">total_examples</span><span class="o">=</span><span class="n">doc2vec_model</span><span class="o">.</span><span class="n">corpus_count</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="n">doc2vec_model</span><span class="o">.</span><span class="n">epochs</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[57]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">doc2vec_model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;../data/doc2vec_model.pkl&#39;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[58]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">X_train_doc2vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">doc2vec_model</span><span class="o">.</span><span class="n">infer_vector</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">words</span><span class="p">)</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">train_documents</span><span class="p">])</span>
+<span class="n">X_test_doc2vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">doc2vec_model</span><span class="o">.</span><span class="n">infer_vector</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">words</span><span class="p">)</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">test_documents</span><span class="p">])</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput">
+<h1>Model Training<a rel="noopener" class="anchor-link" href="#Model-Training">&#182;</a></h1>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[59]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">models</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;XGBClassifier&quot;</span><span class="p">:</span> <span class="n">XGBClassifier</span><span class="p">(),</span>
+    <span class="s2">&quot;SVC&quot;</span><span class="p">:</span><span class="n">SVC</span><span class="p">(),</span>
+    <span class="s2">&quot;LogisticRegression&quot;</span><span class="p">:</span> <span class="n">LogisticRegression</span><span class="p">(),</span>
+    <span class="s2">&quot;RandomForestClassifier&quot;</span><span class="p">:</span> <span class="n">RandomForestClassifier</span><span class="p">(),</span>
+<span class="p">}</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[60]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Dictionary to store X_test variables</span>
+<span class="n">X_tests</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="n">X_test_count</span><span class="p">,</span>
+    <span class="s2">&quot;tfidf&quot;</span><span class="p">:</span> <span class="n">X_test_tfidf</span><span class="p">,</span>
+    <span class="s2">&quot;hashing&quot;</span><span class="p">:</span> <span class="n">X_test_hashing</span><span class="p">,</span>
+    <span class="s2">&quot;doc2vec&quot;</span><span class="p">:</span><span class="n">X_test_doc2vec</span>
+
+<span class="p">}</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[61]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">best_accuracy</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">best_model</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">best_method</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput">
+<p>In this code, the algorithm systematically tests different machine learning models and vectorization methods, training each model and evaluating its performance on the test data; it keeps track of the combination that yields the highest accuracy, updating the best model and vectorization method accordingly.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[62]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">method</span><span class="p">,</span> <span class="n">X_test_method</span> <span class="ow">in</span> <span class="n">X_tests</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">train_variable_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;X_train_</span><span class="si">{</span><span class="n">method</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;_&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="n">train_variable_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Warning: </span><span class="si">{</span><span class="n">train_variable_name</span><span class="si">}</span><span class="s2"> not found in globals(). Skipping.&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="nb">globals</span><span class="p">()[</span><span class="n">train_variable_name</span><span class="p">],</span> <span class="n">y_train</span><span class="p">)</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test_method</span><span class="p">)</span>
+        <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">accuracy</span> <span class="o">&gt;</span> <span class="n">best_accuracy</span><span class="p">:</span>
+            <span class="n">best_accuracy</span> <span class="o">=</span> <span class="n">accuracy</span>
+            <span class="n">best_model</span> <span class="o">=</span> <span class="n">model_name</span>
+            <span class="n">best_method</span> <span class="o">=</span> <span class="n">method</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[63]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">best_accuracy</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[63]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult">
+<pre>0.5789473684210527</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[64]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">best_model</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[64]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult">
+<pre>&#39;XGBClassifier&#39;</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[65]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">best_method</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[65]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult">
+<pre>&#39;doc2vec&#39;</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput">
+<h1>Hyperparameter Tuning with Grid Search Cross Validation<a rel="noopener" class="anchor-link" href="#Hyperparameter-Tuning-with-Grid-Search-Cross-Validation">&#182;</a></h1>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[70]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">param_grid</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;learning_rate&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
+    <span class="s1">&#39;n_estimators&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span>
+    <span class="s1">&#39;max_depth&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span>
+    <span class="s1">&#39;min_child_weight&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+    <span class="s1">&#39;subsample&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+    <span class="s1">&#39;colsample_bytree&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+<span class="p">}</span>
+
+<span class="n">xgb_model</span> <span class="o">=</span> <span class="n">XGBClassifier</span><span class="p">()</span>
+<span class="n">grid_search</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span>
+    <span class="n">estimator</span><span class="o">=</span><span class="n">xgb_model</span><span class="p">,</span>
+    <span class="n">param_grid</span><span class="o">=</span><span class="n">param_grid</span><span class="p">,</span>
+    <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;accuracy&#39;</span><span class="p">,</span>  
+    <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>  
+    <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span>  
+<span class="p">)</span>
+
+<span class="n">grid_search</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_doc2vec</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="n">best_params</span> <span class="o">=</span> <span class="n">grid_search</span><span class="o">.</span><span class="n">best_params_</span>
+<span class="n">best_estimator</span> <span class="o">=</span> <span class="n">grid_search</span><span class="o">.</span><span class="n">best_estimator_</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output">
+<pre>Fitting 5 folds for each of 729 candidates, totalling 3645 fits
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[71]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">best_params</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[71]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult">
+<pre>{&#39;colsample_bytree&#39;: 0.8,
+ &#39;learning_rate&#39;: 0.1,
+ &#39;max_depth&#39;: 3,
+ &#39;min_child_weight&#39;: 5,
+ &#39;n_estimators&#39;: 100,
+ &#39;subsample&#39;: 0.8}</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[72]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">best_estimator</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[72]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult">
+<div class="sk-top-container"><div class="sk-text-repr-fallback"><pre>XGBClassifier(base_score=None, booster=None, callbacks=None,
+              colsample_bylevel=None, colsample_bynode=None,
+              colsample_bytree=0.8, device=None, early_stopping_rounds=None,
+              enable_categorical=False, eval_metric=None, feature_types=None,
+              gamma=None, grow_policy=None, importance_type=None,
+              interaction_constraints=None, learning_rate=0.1, max_bin=None,
+              max_cat_threshold=None, max_cat_to_onehot=None,
+              max_delta_step=None, max_depth=3, max_leaves=None,
+              min_child_weight=5, missing=nan, monotone_constraints=None,
+              multi_strategy=None, n_estimators=100, n_jobs=None,
+              num_parallel_tree=None, objective=&#39;multi:softprob&#39;, ...)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br/>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container"><div class="sk-item"><div class="sk-estimator sk-toggleable"><label for="sk-estimator-id-1" class="sk-toggleable__label sk-toggleable__label-arrow">XGBClassifier</label><div class="sk-toggleable__content"><pre>XGBClassifier(base_score=None, booster=None, callbacks=None,
+              colsample_bylevel=None, colsample_bynode=None,
+              colsample_bytree=0.8, device=None, early_stopping_rounds=None,
+              enable_categorical=False, eval_metric=None, feature_types=None,
+              gamma=None, grow_policy=None, importance_type=None,
+              interaction_constraints=None, learning_rate=0.1, max_bin=None,
+              max_cat_threshold=None, max_cat_to_onehot=None,
+              max_delta_step=None, max_depth=3, max_leaves=None,
+              min_child_weight=5, missing=nan, monotone_constraints=None,
+              multi_strategy=None, n_estimators=100, n_jobs=None,
+              num_parallel_tree=None, objective=&#39;multi:softprob&#39;, ...)</pre></div></div></div></div></div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[73]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">best_estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test_doc2vec</span><span class="p">)</span>
+
+<span class="n">acc</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">class_rep</span> <span class="o">=</span> <span class="n">classification_report</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output">
+<pre>E:\Conestoga\ML programming\Sentiment Analysis\venv\Lib\site-packages\sklearn\metrics\_classification.py:1471: UndefinedMetricWarning:
+
+Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+
+E:\Conestoga\ML programming\Sentiment Analysis\venv\Lib\site-packages\sklearn\metrics\_classification.py:1471: UndefinedMetricWarning:
+
+Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+
+E:\Conestoga\ML programming\Sentiment Analysis\venv\Lib\site-packages\sklearn\metrics\_classification.py:1471: UndefinedMetricWarning:
+
+Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[74]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">acc</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[74]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult">
+<pre>0.47368421052631576</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[83]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">best_model</span><span class="p">,</span> <span class="s1">&#39;../data/xgboost_model.pkl&#39;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[83]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult">
+<pre>[&#39;../data/xgboost_model.pkl&#39;]</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[84]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">param_grid_svc</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="s1">&#39;gamma&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.01</span><span class="p">,</span><span class="mf">0.001</span><span class="p">],</span><span class="s1">&#39;kernel&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;rbf&#39;</span><span class="p">,</span> <span class="s1">&#39;poly&#39;</span><span class="p">,</span> <span class="s1">&#39;sigmoid&#39;</span><span class="p">]}</span>
+<span class="n">svc</span> <span class="o">=</span> <span class="n">SVC</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[85]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">grid_svc</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">svc</span><span class="p">,</span><span class="n">param_grid_svc</span><span class="p">,</span><span class="n">refit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">grid_svc</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_doc2vec</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">best_params_svc</span> <span class="o">=</span> <span class="n">grid_svc</span><span class="o">.</span><span class="n">best_params_</span>
+<span class="n">best_estimator_svc</span> <span class="o">=</span> <span class="n">grid_svc</span><span class="o">.</span><span class="n">best_estimator_</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output">
+<pre>Fitting 5 folds for each of 48 candidates, totalling 240 fits
+[CV] END .........................C=0.1, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END .........................C=0.1, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END .........................C=0.1, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END .........................C=0.1, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END .........................C=0.1, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END ........................C=0.1, gamma=1, kernel=poly; total time=   0.0s
+[CV] END ........................C=0.1, gamma=1, kernel=poly; total time=   0.0s
+[CV] END ........................C=0.1, gamma=1, kernel=poly; total time=   0.0s
+[CV] END ........................C=0.1, gamma=1, kernel=poly; total time=   0.0s
+[CV] END ........................C=0.1, gamma=1, kernel=poly; total time=   0.0s
+[CV] END .....................C=0.1, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END .....................C=0.1, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END .....................C=0.1, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END .....................C=0.1, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END .....................C=0.1, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END .......................C=0.1, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END .......................C=0.1, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END .......................C=0.1, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END .......................C=0.1, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END .......................C=0.1, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END ......................C=0.1, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END ......................C=0.1, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END ......................C=0.1, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END ......................C=0.1, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END ......................C=0.1, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END ...................C=0.1, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END ...................C=0.1, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END ...................C=0.1, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END ...................C=0.1, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END ...................C=0.1, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END ......................C=0.1, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END ......................C=0.1, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END ......................C=0.1, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END ......................C=0.1, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END ......................C=0.1, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END .....................C=0.1, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END .....................C=0.1, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END .....................C=0.1, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END .....................C=0.1, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END .....................C=0.1, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END ..................C=0.1, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END ..................C=0.1, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END ..................C=0.1, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END ..................C=0.1, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END ..................C=0.1, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END .....................C=0.1, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END .....................C=0.1, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END .....................C=0.1, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END .....................C=0.1, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END .....................C=0.1, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END ....................C=0.1, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END ....................C=0.1, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END ....................C=0.1, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END ....................C=0.1, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END ....................C=0.1, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END .................C=0.1, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END .................C=0.1, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END .................C=0.1, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END .................C=0.1, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END .................C=0.1, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END ...........................C=1, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END ...........................C=1, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END ...........................C=1, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END ...........................C=1, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END ...........................C=1, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END ..........................C=1, gamma=1, kernel=poly; total time=   0.0s
+[CV] END ..........................C=1, gamma=1, kernel=poly; total time=   0.0s
+[CV] END ..........................C=1, gamma=1, kernel=poly; total time=   0.0s
+[CV] END ..........................C=1, gamma=1, kernel=poly; total time=   0.0s
+[CV] END ..........................C=1, gamma=1, kernel=poly; total time=   0.0s
+[CV] END .......................C=1, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END .......................C=1, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END .......................C=1, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END .......................C=1, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END .......................C=1, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END .........................C=1, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END .........................C=1, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END .........................C=1, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END .........................C=1, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END .........................C=1, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END ........................C=1, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END ........................C=1, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END ........................C=1, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END ........................C=1, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END ........................C=1, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END .....................C=1, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END .....................C=1, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END .....................C=1, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END .....................C=1, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END .....................C=1, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END ........................C=1, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END ........................C=1, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END ........................C=1, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END ........................C=1, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END ........................C=1, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END .......................C=1, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END .......................C=1, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END .......................C=1, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END .......................C=1, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END .......................C=1, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END ....................C=1, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END ....................C=1, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END ....................C=1, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END ....................C=1, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END ....................C=1, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END .......................C=1, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END .......................C=1, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END .......................C=1, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END .......................C=1, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END .......................C=1, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END ......................C=1, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END ......................C=1, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END ......................C=1, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END ......................C=1, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END ......................C=1, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END ...................C=1, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END ...................C=1, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END ...................C=1, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END ...................C=1, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END ...................C=1, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END ..........................C=10, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END ..........................C=10, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END ..........................C=10, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END ..........................C=10, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END ..........................C=10, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END .........................C=10, gamma=1, kernel=poly; total time=   0.0s
+[CV] END .........................C=10, gamma=1, kernel=poly; total time=   0.0s
+[CV] END .........................C=10, gamma=1, kernel=poly; total time=   0.0s
+[CV] END .........................C=10, gamma=1, kernel=poly; total time=   0.0s
+[CV] END .........................C=10, gamma=1, kernel=poly; total time=   0.0s
+[CV] END ......................C=10, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END ......................C=10, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END ......................C=10, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END ......................C=10, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END ......................C=10, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END ........................C=10, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END ........................C=10, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END ........................C=10, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END ........................C=10, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END ........................C=10, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END .......................C=10, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END .......................C=10, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END .......................C=10, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END .......................C=10, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END .......................C=10, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END ....................C=10, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END ....................C=10, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END ....................C=10, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END ....................C=10, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END ....................C=10, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END .......................C=10, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END .......................C=10, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END .......................C=10, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END .......................C=10, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END .......................C=10, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END ......................C=10, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END ......................C=10, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END ......................C=10, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END ......................C=10, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END ......................C=10, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END ...................C=10, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END ...................C=10, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END ...................C=10, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END ...................C=10, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END ...................C=10, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END ......................C=10, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END ......................C=10, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END ......................C=10, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END ......................C=10, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END ......................C=10, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END .....................C=10, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END .....................C=10, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END .....................C=10, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END .....................C=10, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END .....................C=10, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END ..................C=10, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END ..................C=10, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END ..................C=10, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END ..................C=10, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END ..................C=10, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END .........................C=100, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END .........................C=100, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END .........................C=100, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END .........................C=100, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END .........................C=100, gamma=1, kernel=rbf; total time=   0.0s
+[CV] END ........................C=100, gamma=1, kernel=poly; total time=   0.0s
+[CV] END ........................C=100, gamma=1, kernel=poly; total time=   0.0s
+[CV] END ........................C=100, gamma=1, kernel=poly; total time=   0.0s
+[CV] END ........................C=100, gamma=1, kernel=poly; total time=   0.0s
+[CV] END ........................C=100, gamma=1, kernel=poly; total time=   0.0s
+[CV] END .....................C=100, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END .....................C=100, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END .....................C=100, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END .....................C=100, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END .....................C=100, gamma=1, kernel=sigmoid; total time=   0.0s
+[CV] END .......................C=100, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END .......................C=100, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END .......................C=100, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END .......................C=100, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END .......................C=100, gamma=0.1, kernel=rbf; total time=   0.0s
+[CV] END ......................C=100, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END ......................C=100, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END ......................C=100, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END ......................C=100, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END ......................C=100, gamma=0.1, kernel=poly; total time=   0.0s
+[CV] END ...................C=100, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END ...................C=100, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END ...................C=100, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END ...................C=100, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END ...................C=100, gamma=0.1, kernel=sigmoid; total time=   0.0s
+[CV] END ......................C=100, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END ......................C=100, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END ......................C=100, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END ......................C=100, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END ......................C=100, gamma=0.01, kernel=rbf; total time=   0.0s
+[CV] END .....................C=100, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END .....................C=100, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END .....................C=100, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END .....................C=100, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END .....................C=100, gamma=0.01, kernel=poly; total time=   0.0s
+[CV] END ..................C=100, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END ..................C=100, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END ..................C=100, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END ..................C=100, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END ..................C=100, gamma=0.01, kernel=sigmoid; total time=   0.0s
+[CV] END .....................C=100, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END .....................C=100, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END .....................C=100, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END .....................C=100, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END .....................C=100, gamma=0.001, kernel=rbf; total time=   0.0s
+[CV] END ....................C=100, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END ....................C=100, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END ....................C=100, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END ....................C=100, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END ....................C=100, gamma=0.001, kernel=poly; total time=   0.0s
+[CV] END .................C=100, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END .................C=100, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END .................C=100, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END .................C=100, gamma=0.001, kernel=sigmoid; total time=   0.0s
+[CV] END .................C=100, gamma=0.001, kernel=sigmoid; total time=   0.0s
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[86]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">best_params_svc</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[86]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult">
+<pre>{&#39;C&#39;: 0.1, &#39;gamma&#39;: 1, &#39;kernel&#39;: &#39;rbf&#39;}</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[87]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">best_estimator_svc</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[87]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult">
+<div class="sk-top-container"><div class="sk-text-repr-fallback"><pre>SVC(C=0.1, gamma=1, random_state=42)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br/>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container"><div class="sk-item"><div class="sk-estimator sk-toggleable"><label for="sk-estimator-id-3" class="sk-toggleable__label sk-toggleable__label-arrow">SVC</label><div class="sk-toggleable__content"><pre>SVC(C=0.1, gamma=1, random_state=42)</pre></div></div></div></div></div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[88]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">y_pred_svc</span> <span class="o">=</span> <span class="n">best_estimator_svc</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test_doc2vec</span><span class="p">)</span>
+
+<span class="n">acc_svc</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_svc</span><span class="p">)</span>
+<span class="n">class_rep_svc</span> <span class="o">=</span> <span class="n">classification_report</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_svc</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output">
+<pre>E:\Conestoga\ML programming\Sentiment Analysis\venv\Lib\site-packages\sklearn\metrics\_classification.py:1471: UndefinedMetricWarning:
+
+Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+
+E:\Conestoga\ML programming\Sentiment Analysis\venv\Lib\site-packages\sklearn\metrics\_classification.py:1471: UndefinedMetricWarning:
+
+Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+
+E:\Conestoga\ML programming\Sentiment Analysis\venv\Lib\site-packages\sklearn\metrics\_classification.py:1471: UndefinedMetricWarning:
+
+Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[89]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">acc_svc</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[89]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult">
+<pre>0.47368421052631576</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&#160;[90]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
+     <div class="CodeMirror cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">best_estimator_svc</span><span class="p">,</span> <span class="s1">&#39;../data/svc_model.pkl&#39;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[90]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult">
+<pre>[&#39;../data/svc_model.pkl&#39;]</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput">
+<h1>Conclusion and Final Remarks<a rel="noopener" class="anchor-link" href="#Conclusion-and-Final-Remarks">&#182;</a></h1><h2>Project Overview<a rel="noopener" class="anchor-link" href="#Project-Overview">&#182;</a></h2><p>This sentiment analysis project focused on leveraging natural language processing (NLP) techniques to determine the sentiment expressed in textual data. Sentiment analysis has widespread applications, including social media monitoring, customer feedback analysis, and product reviews.</p>
+<h3>XGBoost Model<a rel="noopener" class="anchor-link" href="#XGBoost-Model">&#182;</a></h3><ul>
+<li><p><strong>Test Data Accuracy:</strong> 57.89%</p>
+</li>
+<li><p><strong>Best Estimator:</strong> [Saved as &#39;xgboost_model.pkl&#39;]</p>
+</li>
+</ul>
+<h2>Model Evaluation<a rel="noopener" class="anchor-link" href="#Model-Evaluation">&#182;</a></h2><p>Both models were evaluated on a separate test dataset. It&#39;s important to note that the interpretation of accuracy depends on the specific requirements of the sentiment analysis task.</p>
+<ul>
+<li><p>XGBoost Model Accuracy (Without fine-tuning): 57.89 %</p>
+</li>
+<li><p>SVC Model Accuracy: 47.36%</p>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<script type="module" src="https://s.brightspace.com/lib/bsi/20.23.12-266/unbundled/mathjax.js"></script><script type="text/javascript">document.addEventListener('DOMContentLoaded', function() {
+					if (document.querySelector('math') || /\$\$|\\\(|\\\[|\\begin{|\\ref{|\\eqref{/.test(document.body.innerHTML)) {
+						document.querySelectorAll('mspace[linebreak="newline"]').forEach(elm => {
+							elm.setAttribute('style', 'display: block; height: 0.5rem;');
+						});
+
+						window.D2L.MathJax.loadMathJax({
+							'outputScale': 1.5,
+							'renderLatex': true
+						});
+					}
+				});</script><script type="module" src="https://s.brightspace.com/lib/bsi/20.23.12-266/unbundled/prism.js"></script><script type="text/javascript">document.addEventListener('DOMContentLoaded', function() {
+					document.querySelectorAll('.d2l-code').forEach(code => {
+						window.D2L.Prism.formatCodeElement(code);
+					});
+				});</script></body></html>
